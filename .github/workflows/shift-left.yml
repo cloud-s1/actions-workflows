@@ -218,6 +218,6 @@ jobs:
       DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
       APP_NAME: ${{ inputs.APP_NAME }}
     secrets:
-      ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-      ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+      # ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+      # ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
       DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
