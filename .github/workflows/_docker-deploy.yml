@@ -118,17 +118,17 @@ jobs:
 
   prepare_host_ips:
     name: prepare deploy env
-    uses: s1line1/infra-live/.github/workflows/test.yml@main
+    uses: s1line1/infra-live/.github/workflows/test.yml@feature_cloud
     with:
       command: "apply"
 
   deploy:
     name: deploy 
-    uses: s1line1/ansible-playbook/.github/workflows/CICD-ansible.yml@main
+    uses: s1line1/ansible-playbook/.github/workflows/CICD-ansible.yml@feature_workflows
     needs: [prepare_host_ips]
     with:
       CLOUD_TYPE: ${{ inputs.CLOUD }}
       DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
       APP_NAME: ${{ inputs.APP_NAME }}
       HOST_IPS: ${{ needs.prepare_host_ips.outputs.host_ips }}
-
+      
