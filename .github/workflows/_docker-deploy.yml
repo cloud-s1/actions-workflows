@@ -23,6 +23,7 @@ on:
       DEPLOY_REPO_TOKEN:
         required: true
     
+    
 jobs:
   # deploy_load_secrets:
   #   name: Load secrets from OSS
