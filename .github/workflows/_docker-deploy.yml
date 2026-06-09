@@ -22,7 +22,10 @@ on:
       #   required: true
       DEPLOY_REPO_TOKEN:
         required: true
-    
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   # deploy_load_secrets:
