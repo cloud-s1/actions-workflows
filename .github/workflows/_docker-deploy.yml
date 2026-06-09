@@ -130,5 +130,5 @@ jobs:
       CLOUD_TYPE: ${{ inputs.CLOUD }}
       DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
       APP_NAME: ${{ inputs.APP_NAME }}
-      HOST_IPS: ${{ needs:prepare_host_ips.outputs.host_ips }}
+      HOST_IPS: ${{ needs.prepare_host_ips.outputs.host_ips }}
 
