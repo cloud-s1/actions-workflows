@@ -138,6 +138,10 @@ on:
         required: true
       DEPLOY_REPO_TOKEN:
         required: true
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
 
     outputs:
       has-docker-image:
@@ -194,6 +198,8 @@ jobs:
     secrets:
       ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
       ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
   # deploy-images:
   #   name: Deploy Docker Images
@@ -221,4 +227,6 @@ jobs:
     secrets:
       # ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
       # ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
