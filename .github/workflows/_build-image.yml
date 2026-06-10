@@ -62,7 +62,7 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     if: inputs.images != '[]'
-    needs: [load_secrets, calculate]
+    needs: [calculate]
     # env:
     #   DOCKER_USERNAME: ${{ needs.load_secrets.outputs.docker-username }}
     #   DOCKER_PASSWORD: ${{ needs.load_secrets.outputs.docker-password }}
@@ -98,13 +98,13 @@ jobs:
   scan:
     name: Scan image in ACR
     if: inputs.images != '[]'
-    needs: [load_secrets, calculate, build-docker-image]
+    needs: [calculate, build-docker-image]
     runs-on: ubuntu-latest
     steps:
       - name: Scan image in ACR
         uses: aliyun/acr-scan@v1
         with:
-          region-id: "${{ needs.load_secrets.outputs.region-id }}"
+          region-id: "${{ fromJSON(inputs.images)[0].region_id }}"
           access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
           access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
           repository: "${{ fromJSON(inputs.images)[0].namespace }}/${{ fromJSON(inputs.images)[0].name }}"

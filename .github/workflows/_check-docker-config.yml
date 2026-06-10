@@ -78,6 +78,7 @@ jobs:
       dockerfile: ${{ steps.parse.outputs.dockerfile }}
       registry: ${{ steps.parse.outputs.registry }}
       namespace: ${{ steps.parse.outputs.namespace }}
+      region_id: ${{ steps.parse.outputs.region_id }}
     steps:
       - name: Output parsed images for debugging
         id: parse
@@ -86,6 +87,7 @@ jobs:
           echo "dockerfile=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].dockerfile // empty')" >> "$GITHUB_OUTPUT"
           echo "registry=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].registry // empty')" >> "$GITHUB_OUTPUT"
           echo "namespace=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].namespace // empty')" >> "$GITHUB_OUTPUT"
+          echo "region_id=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].region_id // empty')" >> "$GITHUB_OUTPUT"
 
   parse-docker-config-tests:
     name: Parse tests content
