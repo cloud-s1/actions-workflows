@@ -157,16 +157,17 @@ jobs:
           fi
           echo "AWS credentials verified successfully"
 
-      - name: terraform ${{ inputs.command }}
+        # if [ "${{ inputs.command }}" = "apply" ]; then
+        #   terraform plan
+        # fi
+      - name: terraform apply
         if: inputs.CLOUD == 'aws'
         working-directory: infra-live
         run: |
           cd services/${{ inputs.APP_NAME }}/${{ inputs.DEPLOY_ENV }}/aws
           terraform init
-          if [ "${{ inputs.command }}" = "apply" ]; then
-            terraform plan
-          fi
-          terraform ${{ inputs.command }} -auto-approve
+          terraform plan
+          terraform apply -auto-approve
 
 
   # deploy:
