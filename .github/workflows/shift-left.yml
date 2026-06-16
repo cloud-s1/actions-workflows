@@ -299,9 +299,9 @@ jobs:
           token: ${{ secrets.CHECKOUT_TOKEN }}
       
       - name: cd ${{ inputs.server_name }}
+        working-directory: ${{ inputs.server_name }}
         run: |
           pwd
-          cd ./${{ inputs.server_name }}
 
       - name: Build test image
         if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile ) != ''
