@@ -306,18 +306,23 @@ jobs:
           ls
 
       - name: Build test image
-        if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile ) != ''
+        if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null'
         working-directory: ${{ inputs.server_name }}
         run: |
-          docker build \
-            -f ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile }} \
-            -t springboot-test:${{ github.sha }} \
-            .
+          DOCKERFILE="${{ fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile }}"
+          if [ -f "$DOCKERFILE" ]; then
+            docker build -f "$DOCKERFILE" -t "springboot-test:${{ github.sha }}" .
+          else
+            echo "Skipping: $DOCKERFILE not found"
+          fi
 
       - name: Run mvn clean verify
-        if: fromJSON(needs.check-docker-config.outputs.tests)[0].command != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].command ) != ''
+        if: fromJSON(needs.check-docker-config.outputs.tests)[0].command != 'null'
         working-directory: ${{ inputs.server_name }}
         run: |
-          docker run --rm \
-            springboot-test:${{ github.sha }} \
-            bash ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].command }}
+          SCRIPT="${{ fromJSON(needs.check-docker-config.outputs.tests)[0].command }}"
+          if [ -f "$SCRIPT" ]; then
+            docker run --rm "springboot-test:${{ github.sha }}" bash "$SCRIPT"
+          else
+            echo "Skipping: $SCRIPT not found"
+          fi
