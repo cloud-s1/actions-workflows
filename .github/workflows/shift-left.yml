@@ -252,7 +252,8 @@ jobs:
     name: Check docker config
     uses: ./.github/workflows/_check-docker-config.yml
     with:
-      work_dir: ${{ inputs.service_name }}
+      org: ${{ inputs.org }}
+      service_name: ${{ inputs.service_name}}
 
 
   # check-docker-config:

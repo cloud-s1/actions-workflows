@@ -7,9 +7,6 @@ on:
         description: Runner for the job
         type: string
         default: ''
-      work_dir:
-        type: string
-        description: working directory
       org:
         type: string
         required: true
