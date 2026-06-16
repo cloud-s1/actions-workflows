@@ -300,16 +300,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Checkout ${{ inputs.org }}/${{ inputs.server_name}}
+      - name: Checkout ${{ inputs.org }}/${{ inputs.service_name}}
         uses: actions/checkout@v4
         with:
-          repository: ${{ inputs.org }}/${{ inputs.server_name}}
-          path: ${{ inputs.server_name}}
+          repository: ${{ inputs.org }}/${{ inputs.service_name}}
+          path: ${{ inputs.service_name}}
           token: ${{ secrets.CHECKOUT_TOKEN }}
 
       - name: Build test image
         if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null'
-        working-directory: ${{ inputs.server_name }}
+        working-directory: ${{ inputs.service_name }}
         run: |
           DOCKERFILE="${{ fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile }}"
           if [ -f "$DOCKERFILE" ]; then
@@ -320,7 +320,7 @@ jobs:
 
       - name: Run mvn clean verify
         if: fromJSON(needs.check-docker-config.outputs.tests)[0].command != 'null'
-        working-directory: ${{ inputs.server_name }}
+        working-directory: ${{ inputs.service_name }}
         run: |
           SCRIPT="${{ fromJSON(needs.check-docker-config.outputs.tests)[0].command }}"
           if [ -f "$SCRIPT" ]; then
