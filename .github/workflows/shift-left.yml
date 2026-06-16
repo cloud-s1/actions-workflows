@@ -278,4 +278,6 @@ jobs:
         with:
           working-directory: ${{ inputs.server_name }}
 
-      
+      - name: print log
+        run: |
+          echo '${{ steps.docker-image.outputs.images }}'
