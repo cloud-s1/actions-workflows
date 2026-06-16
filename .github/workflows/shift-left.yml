@@ -106,13 +106,15 @@ name: CI shift-left
 on:
   workflow_dispatch:
     inputs:
-      repo:
+      org:
         type: string # s1line1/github-actions-demo
       run_number:
         type: number
         default: 0
       tag_sha:
         type: string
+      server_name:
+        type: string # github-actions-demo
        
 
 #   workflow_call:
@@ -243,15 +245,37 @@ on:
 #       DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
 
 jobs:
-  check-repo:
-    name: Check Service
+  check-docker-config:
     runs-on: ubuntu-latest
+    outputs:
+      has-docker-image: ${{ steps.docker-image.outputs.has-docker-image }}
+      images: ${{ steps.docker-image.outputs.images }}
+      tests: ${{ steps.docker-image.outputs.tests }}
+      image-name: ${{ steps.docker-image.outputs.image-name }}
+      image-dockerfile: ${{ steps.docker-image.outputs.image-dockerfile }}
+      image-registry: ${{ steps.docker-image.outputs.image-registry }}
+      image-namespace: ${{ steps.docker-image.outputs.image-namespace }}
+      image-region_id: ${{ steps.docker-image.outputs.image-region_id }}
+      test-name: ${{ steps.docker-image.outputs.test-name }}
+      test-dockerfile: ${{ steps.docker-image.outputs.test-dockerfile }}
+      test-command: ${{ steps.docker-image.outputs.test-command }}
 
     steps:
       - name: Checkout actions-workflows
         uses: actions/checkout@v4
 
-      - name: Checkout ${{ inputs.repo }}
-        # uses: actions/checkout@v4
-        run: |
-          echo "test checkout"
+      - name: Checkout ${{ inputs.org }}/${{ inputs.server_name}}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.org }}/${{ inputs.server_name}}
+          path: ${{ inputs.server_name}}
+          token: ${{ secrets.CHECKOUT_TOKEN }}
+
+        
+      - name: Check docker config
+        id: docker-image
+        uses: ./.github/workflows/_check-docker-config
+        with:
+          working-directory: ${{ inputs.server_name }}
+
+      
