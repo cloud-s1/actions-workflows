@@ -104,129 +104,154 @@
 name: CI shift-left
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
-      APP_NAME:
-        type: string
-        default: ''
-      run-number:
+      repo:
+        type: string # s1line1/github-actions-demo
+      run_number:
         type: number
         default: 0
-      tag-sha:
+      tag_sha:
         type: string
-        default: ''
-      OSS_BUCKET:
-        type: string
-        default: ''
-      OSS_ENDPOINT:
-        type: string
-        default: ''
-      trigger-event:
-        type: string
-        default: ''
-      DEPLOY_ENV:
-        type: string
-        default: 'dev'
-      CLOUD:
-        type: string
-        default: "aws"
+       
 
-    secrets:
-      ACCESS_KEY_ID:
-        required: true
-      ACCESS_KEY_SECRET:
-        required: true
-      DEPLOY_REPO_TOKEN:
-        required: true
-      DOCKER_USERNAME:
-        required: true
-      DOCKER_PASSWORD:
-        required: true
+#   workflow_call:
+#     inputs:
+#       APP_NAME:
+#         type: string
+#         default: ''
+#       run-number:
+#         type: number
+#         default: 0
+#       tag-sha:
+#         type: string
+#         default: ''
+#       OSS_BUCKET:
+#         type: string
+#         default: ''
+#       OSS_ENDPOINT:
+#         type: string
+#         default: ''
+#       trigger-event:
+#         type: string
+#         default: ''
+#       DEPLOY_ENV:
+#         type: string
+#         default: 'dev'
+#       CLOUD:
+#         type: string
+#         default: "aws"
 
-    outputs:
-      has-docker-image:
-        description: Whether docker-image.yml with images key was found
-        value: ${{ jobs.check-docker-config.outputs.has-docker-image }}
+#     secrets:
+#       ACCESS_KEY_ID:
+#         required: true
+#       ACCESS_KEY_SECRET:
+#         required: true
+#       DEPLOY_REPO_TOKEN:
+#         required: true
+#       DOCKER_USERNAME:
+#         required: true
+#       DOCKER_PASSWORD:
+#         required: true
 
-  pull_request:
-    branches: [main]
+#     outputs:
+#       has-docker-image:
+#         description: Whether docker-image.yml with images key was found
+#         value: ${{ jobs.check-docker-config.outputs.has-docker-image }}
 
-permissions:
-  id-token: write
-  contents: read
-  actions: read
+#   pull_request:
+#     branches: [main]
+
+# permissions:
+#   id-token: write
+#   contents: read
+#   actions: read
+
+# jobs:
+#   check-docker-config:
+#     name: Check docker config
+#     uses: ./.github/workflows/_check-docker-config.yml
+
+#   unit_test:
+#     name: Run ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].name }} Unit Tests
+#     needs: [check-docker-config]
+#     if: needs.check-docker-config.outputs.has-docker-image == 'true' && needs.check-docker-config.outputs.tests != '' && needs.check-docker-config.outputs.tests != '[]'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Build test image
+#         if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile ) != ''
+#         run: |
+#           docker build \
+#             -f ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile }} \
+#             -t springboot-test:${{ github.sha }} \
+#             .
+
+#       - name: Run mvn clean verify
+#         if: fromJSON(needs.check-docker-config.outputs.tests)[0].command != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].command ) != ''
+#         run: |
+#           docker run --rm \
+#             springboot-test:${{ github.sha }} \
+#             bash ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].command }}
+
+#   build-images:
+#     name: Build Docker Images
+#     if: inputs.trigger-event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
+#     needs: [check-docker-config, unit_test]
+#     uses: ./.github/workflows/_build-image.yml
+#     with:
+#       images: ${{ needs.check-docker-config.outputs.images }}
+#       trigger-event: ${{ inputs.trigger-event }}
+#       OSS_ENDPOINT: ${{ inputs.OSS_ENDPOINT }}
+#       OSS_BUCKET: ${{ inputs.OSS_BUCKET }}
+#     secrets:
+#       ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+#       ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+#       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+#       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+#   # deploy-images:
+#   #   name: Deploy Docker Images
+#   #   if: inputs.trigger-event == 'push' && needs.check-docker-config.outputs.has-docker-image == 'true'
+#   #   needs: [check-docker-config, unit_test]
+#   #   uses: ./.github/workflows/_docker-deploy.yml
+#   #   with:
+#   #     trigger-event: ${{ inputs.trigger-event }}
+#   #     OSS_ENDPOINT: ${{ inputs.OSS_ENDPOINT }}
+#   #     OSS_BUCKET: ${{ inputs.OSS_BUCKET }}
+#   #     DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
+#   #   secrets:
+#   #     ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+#   #     ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+#   #     DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
+#   deploy-images:
+#     name: Deploy Docker Images
+#     if: inputs.trigger-event == 'push' && needs.check-docker-config.outputs.has-docker-image == 'true'
+#     needs: [check-docker-config, unit_test]
+#     uses: ./.github/workflows/_docker-deploy.yml
+#     with: 
+#       CLOUD: ${{ inputs.CLOUD }}
+#       DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
+#       APP_NAME: ${{ inputs.APP_NAME }}
+#     secrets:
+#       # ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+#       # ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+#       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+#       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#       DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
 
 jobs:
-  check-docker-config:
-    name: Check docker config
-    uses: ./.github/workflows/_check-docker-config.yml
-
-  unit_test:
-    name: Run ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].name }} Unit Tests
-    needs: [check-docker-config]
-    if: needs.check-docker-config.outputs.has-docker-image == 'true' && needs.check-docker-config.outputs.tests != '' && needs.check-docker-config.outputs.tests != '[]'
+  check-repo:
+    name: Check Service
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout actions-workflows
         uses: actions/checkout@v4
 
-      - name: Build test image
-        if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile ) != ''
+      - name: Checkout ${{ inputs.repo }}
+        # uses: actions/checkout@v4
         run: |
-          docker build \
-            -f ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile }} \
-            -t springboot-test:${{ github.sha }} \
-            .
-
-      - name: Run mvn clean verify
-        if: fromJSON(needs.check-docker-config.outputs.tests)[0].command != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].command ) != ''
-        run: |
-          docker run --rm \
-            springboot-test:${{ github.sha }} \
-            bash ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].command }}
-
-  build-images:
-    name: Build Docker Images
-    if: inputs.trigger-event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
-    needs: [check-docker-config, unit_test]
-    uses: ./.github/workflows/_build-image.yml
-    with:
-      images: ${{ needs.check-docker-config.outputs.images }}
-      trigger-event: ${{ inputs.trigger-event }}
-      OSS_ENDPOINT: ${{ inputs.OSS_ENDPOINT }}
-      OSS_BUCKET: ${{ inputs.OSS_BUCKET }}
-    secrets:
-      ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-      ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-
-  # deploy-images:
-  #   name: Deploy Docker Images
-  #   if: inputs.trigger-event == 'push' && needs.check-docker-config.outputs.has-docker-image == 'true'
-  #   needs: [check-docker-config, unit_test]
-  #   uses: ./.github/workflows/_docker-deploy.yml
-  #   with:
-  #     trigger-event: ${{ inputs.trigger-event }}
-  #     OSS_ENDPOINT: ${{ inputs.OSS_ENDPOINT }}
-  #     OSS_BUCKET: ${{ inputs.OSS_BUCKET }}
-  #     DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
-  #   secrets:
-  #     ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-  #     ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
-  #     DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
-  deploy-images:
-    name: Deploy Docker Images
-    if: inputs.trigger-event == 'push' && needs.check-docker-config.outputs.has-docker-image == 'true'
-    needs: [check-docker-config, unit_test]
-    uses: ./.github/workflows/_docker-deploy.yml
-    with: 
-      CLOUD: ${{ inputs.CLOUD }}
-      DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
-      APP_NAME: ${{ inputs.APP_NAME }}
-    secrets:
-      # ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-      # ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          echo "test checkout"
