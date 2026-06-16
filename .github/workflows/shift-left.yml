@@ -113,7 +113,7 @@ on:
         default: 0
       tag_sha:
         type: string
-      server_name:
+      service_name:
         type: string # github-actions-demo
       trigger-event:
         type: string
@@ -253,6 +253,7 @@ jobs:
     uses: ./.github/workflows/_check-docker-config.yml
     with:
       work_dir: ${{ inputs.server_name }}
+
 
   # check-docker-config:
   #   runs-on: ubuntu-latest
