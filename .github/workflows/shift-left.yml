@@ -293,21 +293,25 @@ jobs:
           else
             echo "Skipping: $SCRIPT not found"
           fi
+      
+      - name: print
+        run: |
+          echo ${{ needs.check-docker-config.outputs.images }}
 
-  build-images:
-    name: Build Docker Images
-    if: inputs.trigger_event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
-    needs: [check-docker-config, unit_test]
-    uses: ./.github/workflows/_build-image.yml
-    with:
-      images: ${{ needs.check-docker-config.outputs.images }}
-      trigger_event: ${{ inputs.trigger_event }}
-      org: ${{ inputs.org }}
-      service_name: ${{ inputs.service_name}}
-      run_number: ${{ inputs.run_number }}
-    secrets:
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
-      ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-      ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+  # build-images:
+  #   name: Build Docker Images
+  #   if: inputs.trigger_event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
+  #   needs: [check-docker-config, unit_test]
+  #   uses: ./.github/workflows/_build-image.yml
+  #   with:
+  #     images: ${{ needs.check-docker-config.outputs.images }}
+  #     trigger_event: ${{ inputs.trigger_event }}
+  #     org: ${{ inputs.org }}
+  #     service_name: ${{ inputs.service_name}}
+  #     run_number: ${{ inputs.run_number }}
+  #   secrets:
+  #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+  #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  #     CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
+  #     ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+  #     ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
