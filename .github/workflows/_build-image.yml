@@ -15,6 +15,9 @@ on:
       service_name:
         type: string
         required: true
+      run_number:
+        type: number
+        required: true
 
     secrets:
       DOCKER_PASSWORD:
@@ -23,6 +26,10 @@ on:
         required: true
       CHECKOUT_TOKEN:
         required: true
+      ACCESS_KEY_ID:
+        required: false
+      ACCESS_KEY_SECRET:
+        required: false
 
 jobs:
   # load_secrets:

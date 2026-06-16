@@ -305,7 +305,10 @@ jobs:
       trigger_event: ${{ inputs.trigger_event }}
       org: ${{ inputs.org }}
       service_name: ${{ inputs.service_name}}
+      run_number: ${{ inputs.run_number }}
     secrets:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
+      ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+      ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
