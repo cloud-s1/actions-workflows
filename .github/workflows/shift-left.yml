@@ -300,7 +300,7 @@ jobs:
       
       - name: cd ${{ inputs.server_name }}
         run: |
-          ls
+          pwd
           cd ./${{ inputs.server_name }}
 
       - name: Build test image
