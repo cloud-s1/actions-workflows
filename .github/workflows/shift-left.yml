@@ -325,7 +325,7 @@ jobs:
   deploy-images:
     name: Deploy Docker Images
     if: inputs.trigger-event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
-    needs: [check-docker-config, unit_test]
+    needs: [build-images]
     uses: ./.github/workflows/_docker-deploy.yml
     with: 
       CLOUD: ${{ inputs.cloud }}
