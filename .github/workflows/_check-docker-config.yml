@@ -57,7 +57,7 @@ jobs:
 
       - name: check docker-image.yml exists
         id: check-exists
-        working-directory: ${{ inputs.server_name }}
+        working-directory: ${{ inputs.service_name }}
         run: |
           if [ -f docker-image.yml ]; then
             echo "has-docker-image=true" >> "$GITHUB_OUTPUT"
@@ -69,7 +69,7 @@ jobs:
 
       - name: Parse images module
         id: parse-images
-        working-directory: ${{ inputs.server_name }}
+        working-directory: ${{ inputs.service_name }}
         if: steps.check-exists.outputs.has-docker-image == 'true'
         run: |
           # Check for images module
@@ -81,7 +81,7 @@ jobs:
         
       - name: Parse tests module
         id: parse-tests
-        working-directory: ${{ inputs.server_name }}
+        working-directory: ${{ inputs.service_name }}
         if: steps.check-exists.outputs.has-docker-image == 'true'
         run: |
           # Check for tests module
