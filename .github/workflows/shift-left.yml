@@ -305,6 +305,7 @@ jobs:
 
       - name: Build test image
         if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile ) != ''
+        working-directory: ${{ inputs.server_name }}
         run: |
           docker build \
             -f ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile }} \
@@ -313,6 +314,7 @@ jobs:
 
       - name: Run mvn clean verify
         if: fromJSON(needs.check-docker-config.outputs.tests)[0].command != 'null' && hashFiles( fromJSON(needs.check-docker-config.outputs.tests)[0].command ) != ''
+        working-directory: ${{ inputs.server_name }}
         run: |
           docker run --rm \
             springboot-test:${{ github.sha }} \
