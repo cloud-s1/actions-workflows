@@ -115,7 +115,7 @@ on:
         type: string
       service_name:
         type: string # github-actions-demo
-      trigger-event:
+      trigger_event:
         type: string
         default: ''
        
@@ -297,12 +297,12 @@ jobs:
 
   build-images:
     name: Build Docker Images
-    if: inputs.trigger-event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
+    if: inputs.trigger_event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
     needs: [check-docker-config, unit_test]
     uses: ./.github/workflows/_build-image.yml
     with:
       images: ${{ needs.check-docker-config.outputs.images }}
-      trigger-event: ${{ inputs.trigger-event }}
+      trigger_event: ${{ inputs.trigger_event }}
       org: ${{ inputs.org }}
       service_name: ${{ inputs.service_name}}
     secrets:

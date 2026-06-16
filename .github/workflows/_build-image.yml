@@ -6,7 +6,7 @@ on:
       images:
         required: true
         type: string
-      trigger-event:
+      trigger_event:
         type: string
         default: ''
       org:
