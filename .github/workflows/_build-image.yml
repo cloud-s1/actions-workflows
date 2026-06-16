@@ -9,21 +9,19 @@ on:
       trigger-event:
         type: string
         default: ''
-      OSS_ENDPOINT:
+      org:
         type: string
         required: true
-      OSS_BUCKET:
+      service_name:
         type: string
         required: true
 
     secrets:
-      ACCESS_KEY_ID:
-        required: true
-      ACCESS_KEY_SECRET:
-        required: true
       DOCKER_PASSWORD:
         required: true
       DOCKER_USERNAME:
+        required: true
+      CHECKOUT_TOKEN:
         required: true
 
 jobs:
@@ -67,12 +65,16 @@ jobs:
     runs-on: ubuntu-latest
     if: inputs.images != '[]'
     needs: [calculate]
-    # env:
-    #   DOCKER_USERNAME: ${{ needs.load_secrets.outputs.docker-username }}
-    #   DOCKER_PASSWORD: ${{ needs.load_secrets.outputs.docker-password }}
     steps:
-      - name: test
-        run: echo "Building Docker image as docker-image.yml with images key was found"
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout ${{ inputs.org }}/${{ inputs.service_name}}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.org }}/${{ inputs.service_name}}
+          path: ${{ inputs.service_name}}
+          token: ${{ secrets.CHECKOUT_TOKEN }}
 
       - name: Login to ACR
         id: docker-login
@@ -88,6 +90,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build and push image to ACR
+        working-directory: ${{ inputs.service_name }}
         run: |
           if [ -z "${{ fromJSON(inputs.images)[0].dockerfile }}" ]; then
             echo "Dockerfile not found in docker-image.yml, skipping"
