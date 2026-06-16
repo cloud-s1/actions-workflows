@@ -264,6 +264,14 @@ jobs:
       - name: Checkout actions-workflows
         uses: actions/checkout@v4
 
+      - name: debug check token
+        run: |
+          if [ -z "${{ secrets.CHECKOUT_TOKEN }}" ]; then
+            echo "CHECKOUT_TOKEN is EMPTY"
+          else
+            echo "CHECKOUT_TOKEN is set"
+          fi
+
       - name: Checkout ${{ inputs.org }}/${{ inputs.server_name}}
         uses: actions/checkout@v4
         with:
