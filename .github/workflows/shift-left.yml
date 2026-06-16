@@ -117,7 +117,17 @@ on:
       trigger_event:
         type: string
         default: ''
+      cloud:
+        type: string
+        required: true
+      DEPLOY_ENV:
+        type: string
+        default: 'dev'
        
+permissions:
+  id-token: write
+  contents: read
+  actions: read
 
 #   workflow_call:
 #     inputs:
@@ -293,10 +303,6 @@ jobs:
           else
             echo "Skipping: $SCRIPT not found"
           fi
-      
-      - name: print
-        run: |
-          echo ${{ needs.check-docker-config.outputs.images }}
 
   build-images:
     name: Build Docker Images
@@ -315,3 +321,17 @@ jobs:
       CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
       ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
       ACCESS_KEY_SECRET: ${{ secrets.ACCESS_KEY_SECRET }}
+
+  deploy-images:
+    name: Deploy Docker Images
+    if: inputs.trigger-event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
+    needs: [check-docker-config, unit_test]
+    uses: ./.github/workflows/_docker-deploy.yml
+    with: 
+      CLOUD: ${{ inputs.cloud }}
+      DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
+      APP_NAME: ${{ inputs.service_name }}
+    secrets:
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}

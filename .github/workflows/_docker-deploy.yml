@@ -12,15 +12,14 @@ on:
         default: 'dev'
       APP_NAME:
         type: string
-        default: ""
         required: true
 
     secrets:
-      # ACCESS_KEY_ID:
-      #   required: true
-      # ACCESS_KEY_SECRET:
-      #   required: true
-      DEPLOY_REPO_TOKEN:
+      DOCKER_PASSWORD:
+        required: true
+      DOCKER_USERNAME:
+        required: true
+      CHECKOUT_TOKEN:
         required: true
 
 permissions:
@@ -126,14 +125,16 @@ jobs:
     with:
       command: "apply"
 
-  deploy:
-    name: deploy 
-    uses: s1line1/ansible-playbook/.github/workflows/CICD-ansible.yml@feature_workflows
-    needs: [prepare_host_ips]
-    with:
-      CLOUD_TYPE: ${{ inputs.CLOUD }}
-      DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
-      APP_NAME: ${{ inputs.APP_NAME }}
-      HOST_IPS: ${{ needs.prepare_host_ips.outputs.host_ips }}
-    secrets:
-      personal_access_token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+  # deploy:
+  #   name: deploy 
+  #   uses: s1line1/ansible-playbook/.github/workflows/CICD-ansible.yml@feature_workflows
+  #   needs: [prepare_host_ips]
+  #   with:
+  #     CLOUD_TYPE: ${{ inputs.CLOUD }}
+  #     DEPLOY_ENV: ${{ inputs.DEPLOY_ENV }}
+  #     APP_NAME: ${{ inputs.APP_NAME }}
+  #     HOST_IPS: ${{ needs.prepare_host_ips.outputs.host_ips }}
+  #   secrets:
+  #     personal_access_token: ${{ secrets.CHECKOUT_TOKEN }}
+  #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+  #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
