@@ -290,6 +290,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Checkout ${{ inputs.org }}/${{ inputs.server_name}}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.org }}/${{ inputs.server_name}}
+          path: ${{ inputs.server_name}}
+          token: ${{ secrets.CHECKOUT_TOKEN }}
       
       - name: cd ${{ inputs.server_name }}
         run: |
