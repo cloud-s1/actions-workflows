@@ -281,6 +281,7 @@ jobs:
       - name: print log
         run: |
           echo '${{ steps.docker-image.outputs.images }}'
+          echo '${{ steps.docker-image.outputs.tests }}'
 
   unit_test:
     name: Run ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].name }} Unit Tests
