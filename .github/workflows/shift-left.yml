@@ -254,6 +254,8 @@ jobs:
     with:
       org: ${{ inputs.org }}
       service_name: ${{ inputs.service_name}}
+    secrets:
+      CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
 
 
   # check-docker-config:
