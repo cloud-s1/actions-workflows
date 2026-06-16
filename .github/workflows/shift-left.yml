@@ -109,8 +109,7 @@ on:
       org:
         type: string # s1line1/github-actions-demo
       run_number:
-        type: number
-        default: 0
+        type: string
       tag_sha:
         type: string
       service_name:
