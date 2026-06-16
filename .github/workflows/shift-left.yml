@@ -115,6 +115,9 @@ on:
         type: string
       server_name:
         type: string # github-actions-demo
+      trigger-event:
+        type: string
+        default: ''
        
 
 #   workflow_call:
@@ -246,42 +249,43 @@ on:
 
 jobs:
   check-docker-config:
-    runs-on: ubuntu-latest
-    outputs:
-      has-docker-image: ${{ steps.docker-image.outputs.has-docker-image }}
-      images: ${{ steps.docker-image.outputs.images }}
-      tests: ${{ steps.docker-image.outputs.tests }}
-      image-name: ${{ steps.docker-image.outputs.image-name }}
-      image-dockerfile: ${{ steps.docker-image.outputs.image-dockerfile }}
-      image-registry: ${{ steps.docker-image.outputs.image-registry }}
-      image-namespace: ${{ steps.docker-image.outputs.image-namespace }}
-      image-region_id: ${{ steps.docker-image.outputs.image-region_id }}
-      test-name: ${{ steps.docker-image.outputs.test-name }}
-      test-dockerfile: ${{ steps.docker-image.outputs.test-dockerfile }}
-      test-command: ${{ steps.docker-image.outputs.test-command }}
+    name: Check docker config
+    uses: ./.github/workflows/_check-docker-config.yml
+    with:
+      work_dir: ${{ inputs.server_name }}
 
-    steps:
-      - name: Checkout actions-workflows
-        uses: actions/checkout@v4
+  # check-docker-config:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     has-docker-image: ${{ steps.docker-image.outputs.has-docker-image }}
+  #     images: ${{ steps.docker-image.outputs.images }}
+  #     tests: ${{ steps.docker-image.outputs.tests }}
+  #     image-name: ${{ steps.docker-image.outputs.image-name }}
+  #     image-dockerfile: ${{ steps.docker-image.outputs.image-dockerfile }}
+  #     image-registry: ${{ steps.docker-image.outputs.image-registry }}
+  #     image-namespace: ${{ steps.docker-image.outputs.image-namespace }}
+  #     image-region_id: ${{ steps.docker-image.outputs.image-region_id }}
+  #     test-name: ${{ steps.docker-image.outputs.test-name }}
+  #     test-dockerfile: ${{ steps.docker-image.outputs.test-dockerfile }}
+  #     test-command: ${{ steps.docker-image.outputs.test-command }}
 
-      - name: Checkout ${{ inputs.org }}/${{ inputs.server_name}}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ inputs.org }}/${{ inputs.server_name}}
-          path: ${{ inputs.server_name}}
-          token: ${{ secrets.CHECKOUT_TOKEN }}
+  #   steps:
+  #     - name: Checkout actions-workflows
+  #       uses: actions/checkout@v4
+
+  #     - name: Checkout ${{ inputs.org }}/${{ inputs.server_name}}
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: ${{ inputs.org }}/${{ inputs.server_name}}
+  #         path: ${{ inputs.server_name}}
+  #         token: ${{ secrets.CHECKOUT_TOKEN }}
 
         
-      - name: Check docker config
-        id: docker-image
-        uses: ./.github/workflows/_check-docker-config
-        with:
-          working-directory: ${{ inputs.server_name }}
-
-      - name: print log
-        run: |
-          echo '${{ steps.docker-image.outputs.images }}'
-          echo '${{ steps.docker-image.outputs.tests }}'
+  #     - name: Check docker config
+  #       id: docker-image
+  #       uses: ./.github/workflows/_check-docker-config
+  #       with:
+  #         working-directory: ${{ inputs.server_name }}
 
   unit_test:
     name: Run ${{ fromJSON(needs.check-docker-config.outputs.tests)[0].name }} Unit Tests
@@ -298,12 +302,6 @@ jobs:
           repository: ${{ inputs.org }}/${{ inputs.server_name}}
           path: ${{ inputs.server_name}}
           token: ${{ secrets.CHECKOUT_TOKEN }}
-      
-      - name: cd ${{ inputs.server_name }}
-        working-directory: ${{ inputs.server_name }}
-        run: |
-          pwd
-          ls
 
       - name: Build test image
         if: fromJSON(needs.check-docker-config.outputs.tests)[0].dockerfile != 'null'
@@ -326,3 +324,15 @@ jobs:
           else
             echo "Skipping: $SCRIPT not found"
           fi
+
+  # build-images:
+  #   name: Build Docker Images
+  #   if: inputs.trigger-event == 'pull_request' && needs.check-docker-config.outputs.has-docker-image == 'true'
+  #   needs: [check-docker-config, unit_test]
+  #   uses: ./.github/workflows/_build-image.yml
+  #   with:
+  #     images: ${{ needs.check-docker-config.outputs.images }}
+  #     trigger-event: ${{ inputs.trigger-event }}
+  #   secrets:
+  #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+  #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

@@ -7,6 +7,9 @@ on:
         description: Runner for the job
         type: string
         default: ''
+      work_dir:
+        type: string
+        description: working directory
     outputs:
       has-docker-image:
         description: Whether docker-image.yml with images key was found
