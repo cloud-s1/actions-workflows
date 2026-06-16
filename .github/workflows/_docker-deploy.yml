@@ -119,11 +119,55 @@ jobs:
   #         ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i $INVENTORY github-actions-demo/deploy.yml \
   #         -e "env=${{ inputs.DEPLOY_ENV }} acr_password=${{ needs.deploy_load_secrets.outputs.docker-password }} acr_user=${{ needs.deploy_load_secrets.outputs.docker-username }}" --private-key ~/.ssh/id_rsa -u root
 
-  prepare_host_ips:
+  get_host_ips:
+    # name: prepare deploy env
+    # uses: s1line1/infra-live/.github/workflows/test.yml@feature_cloud
+    # with:
+    #   command: "apply"
     name: prepare deploy env
-    uses: s1line1/infra-live/.github/workflows/test.yml@feature_cloud
-    with:
-      command: "apply"
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout s1line1/infra-live
+        uses: actions/checkout@v4
+        with:
+          repository: s1line1/infra-live
+          path: infra-live
+          token: ${{ secrets.CHECKOUT_TOKEN }}
+          
+      # set terraform aws credentials
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::361995292965:role/github-actions-terraform-role
+          aws-region: us-east-1
+      
+      - name: Verify AWS credentials  
+        run: |
+          IDENTITY=$(aws sts get-caller-identity --output json)
+          ACCOUNT=$(echo "$IDENTITY" | jq -r '.Account')
+          if [ "$ACCOUNT" != "361995292965" ]; then
+            echo "::error::Expected account 361995292965 but got $ACCOUNT"
+            exit 1
+          fi
+          echo "AWS credentials verified successfully"
+
+      - name: terraform ${{ inputs.command }}
+        if: inputs.CLOUD == 'aws'
+        working-directory: infra-live
+        run: |
+          cd services/${{ inputs.APP_NAME }}/${{ inputs.DEPLOY_ENV }}/aws
+          terraform init
+          if [ "${{ inputs.command }}" = "apply" ]; then
+            terraform plan
+          fi
+          terraform ${{ inputs.command }} -auto-approve
+
 
   # deploy:
   #   name: deploy 
