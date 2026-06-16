@@ -124,6 +124,7 @@ jobs:
     uses: s1line1/infra-live/.github/workflows/test.yml@feature_cloud
     with:
       command: "apply"
+      token: ${{ secrets.CHECKOUT_TOKEN }}
 
   # deploy:
   #   name: deploy 
