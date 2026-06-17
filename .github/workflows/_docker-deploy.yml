@@ -185,7 +185,7 @@ jobs:
       APP_NAME: ${{ inputs.APP_NAME }}
     secrets:
       private_key: ${{ secrets.AWS_KEY}}
-      github_token: ${{ inputs.CHECKOUT_TOKEN }}
+      github_token: ${{ secrets.CHECKOUT_TOKEN }}
 
     # steps:
     #   - name: checkout
