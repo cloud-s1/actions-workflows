@@ -7,6 +7,12 @@ on:
         description: Runner for the job
         type: string
         default: ''
+      org:
+        type: string
+        required: true
+      service_name:
+        type: string
+        required: true
     outputs:
       has-docker-image:
         description: Whether docker-image.yml with images key was found
@@ -18,9 +24,13 @@ on:
         description: JSON array of tests from docker-image.yml
         value: ${{ jobs.check-docker-config.outputs.tests }}
 
+    secrets:
+      CHECKOUT_TOKEN:
+        required: true
+
 jobs:
   check-docker-config:
-    name: Check docker config
+    name: check config
     runs-on: ${{ github.event_name == 'workflow_call' && inputs.runs-on != '' && inputs.runs-on || 'ubuntu-latest' }}
     outputs:
       has-docker-image: ${{ steps.check-exists.outputs.has-docker-image }}
@@ -29,6 +39,13 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+
+      - name: Checkout ${{ inputs.org }}/${{ inputs.service_name}}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.org }}/${{ inputs.service_name}}
+          path: ${{ inputs.service_name}}
+          token: ${{ secrets.CHECKOUT_TOKEN }}
         
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -37,6 +54,7 @@ jobs:
 
       - name: check docker-image.yml exists
         id: check-exists
+        working-directory: ${{ inputs.service_name }}
         run: |
           if [ -f docker-image.yml ]; then
             echo "has-docker-image=true" >> "$GITHUB_OUTPUT"
@@ -48,6 +66,7 @@ jobs:
 
       - name: Parse images module
         id: parse-images
+        working-directory: ${{ inputs.service_name }}
         if: steps.check-exists.outputs.has-docker-image == 'true'
         run: |
           # Check for images module
@@ -59,6 +78,7 @@ jobs:
         
       - name: Parse tests module
         id: parse-tests
+        working-directory: ${{ inputs.service_name }}
         if: steps.check-exists.outputs.has-docker-image == 'true'
         run: |
           # Check for tests module
@@ -78,6 +98,7 @@ jobs:
       dockerfile: ${{ steps.parse.outputs.dockerfile }}
       registry: ${{ steps.parse.outputs.registry }}
       namespace: ${{ steps.parse.outputs.namespace }}
+      region_id: ${{ steps.parse.outputs.region_id }}
     steps:
       - name: Output parsed images for debugging
         id: parse
@@ -86,6 +107,7 @@ jobs:
           echo "dockerfile=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].dockerfile // empty')" >> "$GITHUB_OUTPUT"
           echo "registry=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].registry // empty')" >> "$GITHUB_OUTPUT"
           echo "namespace=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].namespace // empty')" >> "$GITHUB_OUTPUT"
+          echo "region_id=$(echo '${{ needs.check-docker-config.outputs.images }}' | jq -r '.[0].region_id // empty')" >> "$GITHUB_OUTPUT"
 
   parse-docker-config-tests:
     name: Parse tests content
