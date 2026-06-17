@@ -186,6 +186,8 @@ jobs:
     secrets:
       private_key: ${{ secrets.AWS_KEY}}
       CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
 
     # steps:
     #   - name: checkout
