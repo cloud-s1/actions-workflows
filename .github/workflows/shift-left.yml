@@ -335,3 +335,4 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD}}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
+      AWS_KEY: ${{ secrets.AWS_KEY}}
