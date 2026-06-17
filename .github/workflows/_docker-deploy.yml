@@ -178,7 +178,7 @@ jobs:
     name: deploy 
     # runs-on: ubuntu-latest
     needs: [get_host_ips]
-    uses: s1line1/ansible-playbook/.github/workflows/CICD-ansible.yml@feature_workflows
+    uses: s1line1/ansible-playbook/.github/workflows/CICD-ansible.yml@main
     with:
       CLOUD_TYPE: ${{ inputs.CLOUD }}
       HOST_IPS: ${{ needs.get_host_ips.outputs.host_ips }}
